@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useOnboardingStore } from "@/app/onboarding/store";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const onboardingUsernameSchema = onboardingSchema.pick({
   username: true,
@@ -25,6 +27,8 @@ const onboardingUsernameSchema = onboardingSchema.pick({
 type OnboardingUsernameSchema = z.infer<typeof onboardingUsernameSchema>;
 
 export default function OnboardingUsernameForm() {
+  const router = useRouter();
+
   const firstName = useOnboardingStore((state) => state.firstName);
   const lastName = useOnboardingStore((state) => state.lastName);
   const password = useOnboardingStore((state) => state.password);
@@ -47,6 +51,21 @@ export default function OnboardingUsernameForm() {
       repeatPassword,
     });
   };
+
+  useEffect(() => {
+    if (!useOnboardingStore.persist.hasHydrated) return;
+
+    if (!firstName || !lastName || !password || !repeatPassword) {
+      router.push("/onboarding/name");
+    }
+  }, [
+    useOnboardingStore.persist.hasHydrated,
+    firstName,
+    lastName,
+    password,
+    repeatPassword,
+    router,
+  ]);
 
   return (
     <Form {...form}>
